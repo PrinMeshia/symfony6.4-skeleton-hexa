@@ -1,0 +1,33 @@
+# config/services.yaml
+
+parameters:
+
+services:
+    _defaults:
+        autowire: true      # Automatically inject dependencies
+        autoconfigure: true # Automatically register as commands, event subscribers, etc.
+
+    # Application layer
+    App\Application\UseCase\:
+        resource: '../src/Application/UseCase/*'
+
+    # Infrastructure repositories
+    App\Infrastructure\Persistence\DoctrineUserRepository:
+        arguments: ['@doctrine.orm.entity_manager']
+        tags: ['doctrine.repository_service']
+
+    # Bind interface to implementation
+    App\Domain\User\Repository\UserRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineUserRepository'
+
+    # UI Controllers
+    App\UI\Api\:
+        resource: '../src/UI/Api/*'
+        tags: ['controller.service_arguments']
+
+    # Load everything else automatically (except excluded dirs)
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
