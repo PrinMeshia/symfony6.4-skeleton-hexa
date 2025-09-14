@@ -19,6 +19,15 @@ services:
     # Bind interface to implementation
     App\Domain\User\Repository\UserRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineUserRepository'
 
+    # Event handling
+    App\Infrastructure\Event\DomainEventDispatcher:
+        arguments: ['@event_dispatcher', '@logger']
+
+    # Exception handling
+    App\Infrastructure\Exception\GlobalExceptionHandler:
+        arguments: ['@logger']
+        tags: ['kernel.event_listener', { event: 'kernel.exception', method: 'onKernelException' }]
+
     # UI Controllers
     App\UI\Api\:
         resource: '../src/UI/Api/*'

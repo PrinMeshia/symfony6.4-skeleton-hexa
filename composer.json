@@ -19,7 +19,13 @@
         "symfony/maker-bundle": "*",
         "symfony/runtime": "6.4.*",
         "symfony/uid": "6.4.*",
-        "symfony/yaml": "6.4.*"
+        "symfony/yaml": "6.4.*",
+        "lexik/jwt-authentication-bundle": "^2.20",
+        "symfony/security-bundle": "6.4.*",
+        "symfony/validator": "6.4.*",
+        "symfony/monolog-bundle": "^3.0",
+        "nelmio/api-doc-bundle": "^4.15",
+        "nelmio/cors-bundle": "^2.3"
     },
     "config": {
         "allow-plugins": {

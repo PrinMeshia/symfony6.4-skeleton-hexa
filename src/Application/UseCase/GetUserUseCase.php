@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Application\UseCase;
 
 use App\Application\DTO\UserResponse;
+use App\Domain\User\Exception\UserNotFoundException;
 use App\Domain\User\Repository\UserRepositoryInterface;
 use App\Domain\User\ValueObject\UserId;
-use DomainException;
 
 final class GetUserUseCase
 {
@@ -21,7 +21,7 @@ final class GetUserUseCase
         $user = $this->userRepository->findById(UserId::fromString($userId));
 
         if (!$user) {
-            throw new DomainException(sprintf('User with id %s not found', $userId));
+            throw UserNotFoundException::withId($userId);
         }
 
         return new UserResponse(

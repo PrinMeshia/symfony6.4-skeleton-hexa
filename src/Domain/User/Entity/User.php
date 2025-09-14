@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\User\Entity;
 
+use App\Domain\Event\DomainEvent;
+use App\Domain\User\Event\UserCreatedEvent;
 use App\Domain\User\ValueObject\Email;
 use App\Domain\User\ValueObject\UserId;
 use DateTimeImmutable;
@@ -17,6 +19,9 @@ class User
     private DateTimeImmutable $createdAt;
     private DateTimeImmutable $updatedAt;
 
+    /** @var DomainEvent[] */
+    private array $domainEvents = [];
+
     public function __construct(
         UserId $id,
         Email $email,
@@ -29,6 +34,9 @@ class User
         $this->lastName = $lastName;
         $this->createdAt = new DateTimeImmutable();
         $this->updatedAt = new DateTimeImmutable();
+
+        // Émettre l'événement de création
+        $this->recordDomainEvent(new UserCreatedEvent($id, $email, $firstName, $lastName));
     }
 
     public function id(): UserId
@@ -77,5 +85,20 @@ class User
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function recordDomainEvent(DomainEvent $event): void
+    {
+        $this->domainEvents[] = $event;
+    }
+
+    /**
+     * @return DomainEvent[]
+     */
+    public function pullDomainEvents(): array
+    {
+        $events = $this->domainEvents;
+        $this->domainEvents = [];
+        return $events;
     }
 }

@@ -7,15 +7,17 @@ namespace App\Application\UseCase;
 use App\Application\DTO\CreateUserRequest;
 use App\Application\DTO\UserResponse;
 use App\Domain\User\Entity\User;
+use App\Domain\User\Exception\UserAlreadyExistsException;
 use App\Domain\User\Repository\UserRepositoryInterface;
 use App\Domain\User\ValueObject\Email;
 use App\Domain\User\ValueObject\UserId;
-use DomainException;
+use App\Infrastructure\Event\DomainEventDispatcher;
 
 final class CreateUserUseCase
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly DomainEventDispatcher $eventDispatcher
     ) {
     }
 
@@ -25,7 +27,7 @@ final class CreateUserUseCase
 
         // Vérifier que l'email n'existe pas déjà
         if ($this->userRepository->existsByEmail($email)) {
-            throw new DomainException(sprintf('User with email %s already exists', $email->value()));
+            throw UserAlreadyExistsException::withEmail($email->value());
         }
 
         // Créer l'utilisateur
@@ -38,6 +40,9 @@ final class CreateUserUseCase
 
         // Sauvegarder
         $this->userRepository->save($user);
+
+        // Dispatcher les événements du domaine
+        $this->eventDispatcher->dispatch($user->pullDomainEvents());
 
         // Retourner la réponse
         return new UserResponse(

@@ -7,6 +7,8 @@ namespace App\UI\Api;
 use App\Application\DTO\CreateUserRequest;
 use App\Application\UseCase\CreateUserUseCase;
 use App\Application\UseCase\GetUserUseCase;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/users', name: 'api_users_')]
+#[OA\Tag(name: 'Users')]
 final class UserController extends AbstractController
 {
     public function __construct(
@@ -25,6 +28,37 @@ final class UserController extends AbstractController
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
+    #[OA\Post(
+        summary: 'Create a new user',
+        description: 'Creates a new user with the provided information',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: \App\Application\DTO\CreateUserRequest::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'User created successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'data', ref: new Model(type: \App\Application\DTO\UserResponse::class))
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Validation error',
+                content: new OA\JsonContent(ref: new Model(type: \App\Application\DTO\Error::class))
+            ),
+            new OA\Response(
+                response: 409,
+                description: 'User already exists',
+                content: new OA\JsonContent(ref: new Model(type: \App\Application\DTO\Error::class))
+            )
+        ]
+    )]
     public function create(Request $request): JsonResponse
     {
         try {
@@ -72,6 +106,35 @@ final class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'get', methods: ['GET'])]
+    #[OA\Get(
+        summary: 'Get user by ID',
+        description: 'Retrieves a user by their unique identifier',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'User ID',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', format: 'uuid')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'User found',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'data', ref: new Model(type: \App\Application\DTO\UserResponse::class))
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'User not found',
+                content: new OA\JsonContent(ref: new Model(type: \App\Application\DTO\Error::class))
+            )
+        ]
+    )]
     public function get(string $id): JsonResponse
     {
         try {

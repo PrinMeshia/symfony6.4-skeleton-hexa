@@ -1,0 +1,72 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Symfony Hexagonal API
+            description: API documentation for Symfony Hexagonal Architecture
+            version: 1.0.0
+        servers:
+            - url: '%env(API_BASE_URL)%'
+              description: Development server
+        components:
+            securitySchemes:
+                bearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+            schemas:
+                User:
+                    type: object
+                    properties:
+                        id:
+                            type: string
+                            format: uuid
+                        email:
+                            type: string
+                            format: email
+                        firstName:
+                            type: string
+                        lastName:
+                            type: string
+                        fullName:
+                            type: string
+                        createdAt:
+                            type: string
+                            format: date-time
+                        updatedAt:
+                            type: string
+                            format: date-time
+                CreateUserRequest:
+                    type: object
+                    required:
+                        - email
+                        - firstName
+                        - lastName
+                    properties:
+                        email:
+                            type: string
+                            format: email
+                        firstName:
+                            type: string
+                        lastName:
+                            type: string
+                Error:
+                    type: object
+                    properties:
+                        error:
+                            type: string
+                        message:
+                            type: string
+                        violations:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    property:
+                                        type: string
+                                    message:
+                                        type: string
+                                    invalidValue:
+                                        type: string
+    areas:
+        path_patterns:
+            - ^/api(?!/doc)
