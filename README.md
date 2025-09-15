@@ -46,9 +46,6 @@ UI (Controller) → Application (UseCase) → Domain (Entity/Service) → Infras
 
 ```bash
 # Cloner le projet
-git clone <your-repo>
-cd symfony-skeleton
-
 # Lancer le script de setup automatique
 ./scripts/setup.sh
 ```
