@@ -1,21 +1,21 @@
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        App\Domain\User\Entity\User:
+        App\Infrastructure\Security\SecurityUser:
             algorithm: auto
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
-            entity:
-                class: App\Infrastructure\Persistence\Doctrine\UserDoctrineEntity
-                property: email
+            id: App\Infrastructure\Security\UserProvider
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        
+        # Endpoint de login pour obtenir le token JWT
         login:
             pattern: ^/api/login
             stateless: true
@@ -23,10 +23,14 @@ security:
                 check_path: /api/login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        # Routes API protégées par JWT
         api:
             pattern: ^/api
             stateless: true
             jwt: ~
+
+        # Routes web classiques (si nécessaire)
         main:
             lazy: true
             provider: app_user_provider
@@ -35,6 +39,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/health, roles: PUBLIC_ACCESS }
+        - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
