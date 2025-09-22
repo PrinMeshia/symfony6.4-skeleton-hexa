@@ -7,16 +7,32 @@ services:
         autowire: true      # Automatically inject dependencies
         autoconfigure: true # Automatically register as commands, event subscribers, etc.
 
-    # Application layer
+    # Load everything else automatically (except excluded dirs)
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Kernel.php'
+
+    # ========================================
+    # DOMAIN LAYER - Pure business logic
+    # ========================================
+
+    # ========================================
+    # APPLICATION LAYER - Use Cases
+    # ========================================
     App\Application\UseCase\:
         resource: '../src/Application/UseCase/*'
 
-    # Infrastructure repositories
+    # ========================================
+    # INFRASTRUCTURE LAYER - Technical details
+    # ========================================
+
+    # Repository implementations
     App\Infrastructure\Persistence\DoctrineUserRepository:
         arguments: ['@doctrine.orm.entity_manager']
-        tags: ['doctrine.repository_service']
 
-    # Bind interface to implementation
+    # Bind domain repository interface to infrastructure implementation
     App\Domain\User\Repository\UserRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineUserRepository'
 
     # Event handling
@@ -26,17 +42,38 @@ services:
     # Exception handling
     App\Infrastructure\Exception\GlobalExceptionHandler:
         arguments: ['@logger']
-        tags: ['kernel.event_listener', { event: 'kernel.exception', method: 'onKernelException' }]
+        tags: 
+            - { name: 'kernel.event_listener', event: 'kernel.exception', method: 'onKernelException' }
 
-    # UI Controllers
+    # Security layer
+    App\Infrastructure\Security\UserProvider:
+        arguments: ['@App\Domain\User\Repository\UserRepositoryInterface']
+
+    # ========================================
+    # UI LAYER - Controllers and CLI
+    # ========================================
+
+    # API Controllers
     App\UI\Api\:
         resource: '../src/UI/Api/*'
         tags: ['controller.service_arguments']
 
-    # Load everything else automatically (except excluded dirs)
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+    # ========================================
+    # EVENT LISTENERS
+    # ========================================
+    App\Infrastructure\Event\Listener\:
+        resource: '../src/Infrastructure/Event/Listener/*'
+
+    # ========================================
+    # CUSTOM SERVICES
+    # ========================================
+
+    # Logger avec canal personnalisé pour les événements du domaine
+    domain_events.logger:
+        parent: monolog.logger
+        arguments: ['domain_events']
+
+    # Logger pour l'API
+    api.logger:
+        parent: monolog.logger
+        arguments: ['api']
