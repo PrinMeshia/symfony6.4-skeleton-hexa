@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UI\Api;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,8 +22,8 @@ final class HealthController extends AbstractController
 
     #[Route('', name: 'check', methods: ['GET'])]
     #[OA\Get(
-        summary: 'Health check',
         description: 'Returns the health status of the application',
+        summary: 'Health check',
         responses: [
             new OA\Response(
                 response: 200,
@@ -63,7 +64,6 @@ final class HealthController extends AbstractController
             $errors[] = 'Database connection failed: ' . $e->getMessage();
             $status = 'unhealthy';
         }
-
         // Check memory usage
         $memoryUsage = memory_get_usage(true);
         $memoryLimit = ini_get('memory_limit');
@@ -77,8 +77,8 @@ final class HealthController extends AbstractController
         $freeBytes = disk_free_space('.');
         $totalBytes = disk_total_space('.');
         $services['disk'] = [
-            'free' => $this->formatBytes($freeBytes),
-            'total' => $this->formatBytes($totalBytes),
+            'free' => $this->formatBytes((int)$freeBytes),
+            'total' => $this->formatBytes((int)$totalBytes),
             'usage_percent' => round((($totalBytes - $freeBytes) / $totalBytes) * 100, 2),
             'status' => ($freeBytes / $totalBytes) > 0.1 ? 'healthy' : 'warning'
         ];

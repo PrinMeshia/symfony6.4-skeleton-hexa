@@ -9,7 +9,3 @@ api_controllers:
 api_login_check:
     path: /api/login_check
 
-# Documentation API (sera ajoutée par nelmio/api-doc-bundle)
-api_doc:
-    resource: '@NelmioApiDocBundle/Resources/config/routing.yml'
-    prefix: /api/doc
