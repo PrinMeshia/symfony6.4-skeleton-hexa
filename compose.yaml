@@ -3,21 +3,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ecoa_api
+    container_name: symfony_app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
       - ./:/var/www
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - ecoa
+      - symfony
     depends_on:
       database:
         condition: service_healthy
 
   nginx:
     image: nginx:alpine
-    container_name: ecoa_nginx
+    container_name: symfony_nginx
     restart: unless-stopped
     ports:
       - "9080:80"
@@ -27,11 +27,11 @@ services:
     depends_on:
       - app
     networks:
-      - ecoa
+      - symfony
   
   database:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
-    container_name: ecoa_database
+    container_name: symfony_database
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-app}
@@ -42,7 +42,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data:rw
     networks:
-      - ecoa
+      - symfony
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app}"]
       interval: 5s
@@ -55,5 +55,5 @@ volumes:
     driver: local
 
 networks:
-  ecoa:
+  symfony:
     driver: bridge
