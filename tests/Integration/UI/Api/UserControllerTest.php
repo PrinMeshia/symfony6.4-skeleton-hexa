@@ -13,17 +13,24 @@ final class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/api/users', [], [], [
-            'CONTENT_TYPE' => 'application/json',
-        ], json_encode([
+        $jsonData = json_encode([
             'email' => 'test@example.com',
             'firstName' => 'John',
             'lastName' => 'Doe',
-        ]));
+        ]);
+        
+        $this->assertNotFalse($jsonData, 'JSON encoding should not fail');
+
+        $client->request('POST', '/api/users', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], $jsonData);
 
         $this->assertEquals(Response::HTTP_CREATED, $client->getResponse()->getStatusCode());
 
-        $responseData = json_decode($client->getResponse()->getContent(), true);
+        $responseContent = $client->getResponse()->getContent();
+        $this->assertNotFalse($responseContent, 'Response content should not be false');
+        
+        $responseData = json_decode($responseContent, true);
         $this->assertArrayHasKey('data', $responseData);
         $this->assertEquals('test@example.com', $responseData['data']['email']);
         $this->assertEquals('John', $responseData['data']['firstName']);
@@ -34,17 +41,24 @@ final class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/api/users', [], [], [
-            'CONTENT_TYPE' => 'application/json',
-        ], json_encode([
+        $jsonData = json_encode([
             'email' => 'invalid-email',
             'firstName' => '',
             'lastName' => 'Doe',
-        ]));
+        ]);
+        
+        $this->assertNotFalse($jsonData, 'JSON encoding should not fail');
+
+        $client->request('POST', '/api/users', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], $jsonData);
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $client->getResponse()->getStatusCode());
 
-        $responseData = json_decode($client->getResponse()->getContent(), true);
+        $responseContent = $client->getResponse()->getContent();
+        $this->assertNotFalse($responseContent, 'Response content should not be false');
+        
+        $responseData = json_decode($responseContent, true);
         $this->assertArrayHasKey('violations', $responseData);
     }
 
@@ -56,7 +70,10 @@ final class UserControllerTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
 
-        $responseData = json_decode($client->getResponse()->getContent(), true);
+        $responseContent = $client->getResponse()->getContent();
+        $this->assertNotFalse($responseContent, 'Response content should not be false');
+        
+        $responseData = json_decode($responseContent, true);
         $this->assertArrayHasKey('error', $responseData);
     }
 }

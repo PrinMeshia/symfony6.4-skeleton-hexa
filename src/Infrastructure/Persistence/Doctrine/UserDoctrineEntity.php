@@ -16,16 +16,16 @@ class UserDoctrineEntity
 {
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 36)]
-    private string $id;
+    private string $id = '';
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
-    private string $email;
+    private string $email = '';
 
     #[ORM\Column(type: 'string', length: 100)]
-    private string $firstName;
+    private string $firstName = '';
 
     #[ORM\Column(type: 'string', length: 100)]
-    private string $lastName;
+    private string $lastName = '';
 
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $createdAt;
@@ -35,20 +35,26 @@ class UserDoctrineEntity
 
     public function __construct()
     {
-        // Doctrine constructor
+        // Doctrine constructor - propriétés initialisées via fromDomain()
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public static function fromDomain(User $user): self
     {
         $entity = new self();
-        $entity->id = $user->id()->value();
-        $entity->email = $user->email()->value();
-        $entity->firstName = $user->firstName();
-        $entity->lastName = $user->lastName();
-        $entity->createdAt = $user->createdAt();
-        $entity->updatedAt = $user->updatedAt();
-
+        $entity->initializeFromDomain($user);
         return $entity;
+    }
+
+    private function initializeFromDomain(User $user): void
+    {
+        $this->id = $user->id()->value();
+        $this->email = $user->email()->value();
+        $this->firstName = $user->firstName();
+        $this->lastName = $user->lastName();
+        $this->createdAt = $user->createdAt();
+        $this->updatedAt = $user->updatedAt();
     }
 
     public function toDomain(): User

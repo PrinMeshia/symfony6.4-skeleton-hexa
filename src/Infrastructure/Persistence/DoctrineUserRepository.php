@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityRepository;
 
 final class DoctrineUserRepository implements UserRepositoryInterface
 {
+    /** @var EntityRepository<UserDoctrineEntity> */
     private EntityRepository $repository;
 
     public function __construct(private readonly EntityManagerInterface $entityManager)
@@ -23,6 +24,7 @@ final class DoctrineUserRepository implements UserRepositoryInterface
 
     public function save(User $user): void
     {
+        /** @var UserDoctrineEntity|null $existingEntity */
         $existingEntity = $this->repository->find($user->id()->value());
 
         if ($existingEntity) {
@@ -37,6 +39,7 @@ final class DoctrineUserRepository implements UserRepositoryInterface
 
     public function findById(UserId $id): ?User
     {
+        /** @var UserDoctrineEntity|null $entity */
         $entity = $this->repository->find($id->value());
 
         return $entity ? $entity->toDomain() : null;
@@ -44,6 +47,7 @@ final class DoctrineUserRepository implements UserRepositoryInterface
 
     public function findByEmail(Email $email): ?User
     {
+        /** @var UserDoctrineEntity|null $entity */
         $entity = $this->repository->findOneBy(['email' => $email->value()]);
 
         return $entity ? $entity->toDomain() : null;
@@ -56,6 +60,7 @@ final class DoctrineUserRepository implements UserRepositoryInterface
 
     public function delete(User $user): void
     {
+        /** @var UserDoctrineEntity|null $entity */
         $entity = $this->repository->find($user->id()->value());
 
         if ($entity) {
@@ -69,6 +74,7 @@ final class DoctrineUserRepository implements UserRepositoryInterface
      */
     public function findAll(): array
     {
+        /** @var UserDoctrineEntity[] $entities */
         $entities = $this->repository->findAll();
 
         return array_map(fn(UserDoctrineEntity $entity) => $entity->toDomain(), $entities);

@@ -16,7 +16,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class CreateUserUseCaseTest extends TestCase
 {
     private UserRepositoryInterface&MockObject $userRepository;
+    
     private DomainEventDispatcher&MockObject $eventDispatcher;
+    
     private CreateUserUseCase $useCase;
 
     protected function setUp(): void

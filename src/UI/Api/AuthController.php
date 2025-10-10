@@ -61,6 +61,11 @@ final class AuthController extends AbstractController
             return new JsonResponse(['error' => 'Not authenticated'], Response::HTTP_UNAUTHORIZED);
         }
 
+        // Type assertion pour PHPStan
+        if (!$user instanceof \App\Infrastructure\Security\SecurityUser) {
+            return new JsonResponse(['error' => 'Invalid user type'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
         return new JsonResponse([
             'user' => [
                 'id' => $user->getId(),

@@ -20,11 +20,9 @@ parameters:
 
     # Pour ignorer certains patterns connus (si tu veux réduire le bruit)
     ignoreErrors:
-        # Exemple : erreurs sur les propriétés dynamiques dans les mocks PHPUnit
-        - '#Access to an undefined property PHPUnit\\Framework\\MockObject\\MockObject#'
-
-        # Exemple : variables de template Twig (si utilisées dans les contrôleurs)
-        - '#Variable \$[a-zA-Z0-9_]+ might not be defined#'
+        # Erreurs spécifiques aux mocks PHPUnit
+        - '#Call to an undefined method.*::expects\(\)#'
+        - '#Return type of call to method.*createMock\(\) contains unresolvable type#'
 
     # Vérifie les types PHPDoc et return de méthodes
     checkMissingIterableValueType: true

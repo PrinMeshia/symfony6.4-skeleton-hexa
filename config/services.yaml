@@ -28,26 +28,13 @@ services:
     # INFRASTRUCTURE LAYER - Technical details
     # ========================================
 
-    # Repository implementations
-    App\Infrastructure\Persistence\DoctrineUserRepository:
-        arguments: ['@doctrine.orm.entity_manager']
-
     # Bind domain repository interface to infrastructure implementation
     App\Domain\User\Repository\UserRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineUserRepository'
 
-    # Event handling
-    App\Infrastructure\Event\DomainEventDispatcher:
-        arguments: ['@event_dispatcher', '@logger']
-
     # Exception handling
     App\Infrastructure\Exception\GlobalExceptionHandler:
-        arguments: ['@logger']
         tags: 
             - { name: 'kernel.event_listener', event: 'kernel.exception', method: 'onKernelException' }
-
-    # Security layer
-    App\Infrastructure\Security\UserProvider:
-        arguments: ['@App\Domain\User\Repository\UserRepositoryInterface']
 
     # ========================================
     # UI LAYER - Controllers and CLI
@@ -56,7 +43,6 @@ services:
     # API Controllers
     App\UI\Api\:
         resource: '../src/UI/Api/*'
-        tags: ['controller.service_arguments']
 
     # ========================================
     # EVENT LISTENERS

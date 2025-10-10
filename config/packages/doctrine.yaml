@@ -16,7 +16,7 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
-            # Configuration corrigée pour l'architecture hexagonale
+            # Configuration pour l'architecture hexagonale
             App:
                 type: attribute
                 is_bundle: false
